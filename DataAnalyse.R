@@ -71,20 +71,19 @@ add_trace(y = ~despesas.mes$jan, name = 'Jan', mode = 'lines+markers') %>%
 layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title = ''),title = "Gastos de cada mês - Partidos - 2016~2017")
 
 #Plot 2 Gasto Mes
-plot_ly(despesas.mes, y = ~despesas.mes$fev, x = ~despesas.mes$sgPartido, type = 'bar', name = 'Fev', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$mar, name = 'Mar', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$abr, name = 'Abr', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$mai, name = 'Mai', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$jun, name = 'Jun', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$jul, name = 'Jul', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$ago, name = 'Ago', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$set, name = 'Set', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$out, name = 'Out', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$nov, name = 'Nov', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$dez, name = 'Dez', mode = 'lines+markers') %>%
-add_trace(y = ~despesas.mes$jan, name = 'Jan', mode = 'lines+markers') %>%
-layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title = ''),title = "Gastos de cada mês - Partidos - 2016~2017")
-
+plot_ly(despesas.mes, y = ~despesas.mes$fev, x = ~despesas.mes$sgPartido, type = 'bar', name = 'Fev') %>%
+add_trace(y = ~despesas.mes$mar, name = 'Mar') %>%
+add_trace(y = ~despesas.mes$abr, name = 'Abr') %>%
+add_trace(y = ~despesas.mes$mai, name = 'Mai') %>%
+add_trace(y = ~despesas.mes$jun, name = 'Jun') %>%
+add_trace(y = ~despesas.mes$jul, name = 'Jul') %>%
+add_trace(y = ~despesas.mes$ago, name = 'Ago') %>%
+add_trace(y = ~despesas.mes$set, name = 'Set') %>%
+add_trace(y = ~despesas.mes$out, name = 'Out') %>%
+add_trace(y = ~despesas.mes$nov, name = 'Nov') %>%
+add_trace(y = ~despesas.mes$dez, name = 'Dez') %>%
+add_trace(y = ~despesas.mes$jan, name = 'Jan') %>%
+layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title = ''),title = "Gastos de cada mês - Partidos - 2016~2017", barmode = 'group')
 
 #Plot Total Parlamentares
 plot_ly(despesas.politicos.partidos.pie, labels = ~x, values = ~freq, type = 'pie') %>%
@@ -145,10 +144,35 @@ add_trace(y = ~nordeste, name = 'Nordeste') %>%
 add_trace(y = ~norte, name = 'Norte') %>%
 layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title = ''),title = "Total de gastos anual - Região - 2016", barmode = 'group')
 
+#Partidos
+partidos.espc <- NULL
+partidos.espc$sgPartido <- despesas.gastos.total$sgPartido
+partidos.espc$vlrLiquido <- despesas.gastos.total$vlrLiquido
+partidos.espc <- data.frame(partidos.espc)
+ 
+list.partidos <- despesas.gastos.total$sgPartido
+i<-1
+while(i < length(despesas.total.partidos$sgPartido)+1)
+{
+   tmp<-NULL
+   tmp <- partidos[partidos$Sigla == as.character(list.partidos[i]), ]
+   partidos.espc[i,3] = as.character(tmp$Espectro)
+   i<-i+1
+}
 
+names(partidos.espc)[names(partidos.espc)=="V3"] <- "Espectro"
 
+partidos.espc.gastos <- aggregate(vlrLiquido ~ Espectro, partidos.espc, sum, na.rm=TRUE) 
 
-  
-  
-  
-  
+#Plot Gastos por Espectro
+plot_ly(partidos.espc.gastos,x="",y=~partidos.espc.gastos$vlrLiquido[1],type = 'bar',name="Centro")  %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[2], name ="Centro a Centro-direita ") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[3], name ="Centro-direita") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[4], name ="Centro-direita e Direita") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[5], name ="Centro e Centro-esquerda") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[6], name ="Centro-esquerda") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[7], name ="Direita") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[8], name ="Esquerda a Centro-esquerda") %>%
+add_trace(y=~partidos.espc.gastos$vlrLiquido[9], name ="Esquerda a Extrema-esquerda") %>%
+layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title ="Espectros"),title = "Total de Gastos Anual - Espectros - Partidos")
+
