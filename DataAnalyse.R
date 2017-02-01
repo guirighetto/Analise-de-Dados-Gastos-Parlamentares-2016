@@ -11,12 +11,18 @@ partidos = read.csv("/home/guilherme/Documentos/GastosBrasil/Partidos.csv")
 #Analyse
 #Gasto de cada partido
 despesas.total.partidos <- aggregate(vlrLiquido ~ sgPartido, despesas, sum, na.rm=TRUE)
+despesas.total.parlamentar <- aggregate(vlrLiquido ~ txNomeParlamentar+sgPartido,despesas,sum,na.rm=TRUE)
+despesas.total.parlamentar <- despesas.total.parlamentar[-c(1:9),]
+despesas.total.parlamentar$txNomeParlamentar <- paste(despesas.total.parlamentar$txNomeParlamentar,despesas.total.parlamentar$sgPartido)
+despesas.total.parlamentar$sgPartido <- NULL
 despesas.mes.partidos <- aggregate(despesas$vlrLiquido,list(sgPartido = despesas$sgPartido, mes = despesas$numMes), sum)
 despesas.total.partidos <- despesas.total.partidos[-1,]
 despesas.politicos.requisicoes <- count(despesas,c("txNomeParlamentar","sgPartido"))
 despesas.politicos.partidos <- count(despesas.politicos.requisicoes$sgPartido)
 despesas.politicos.partidos.pie <- despesas.politicos.partidos[-1,]
 despesas.politicos.partidos.pie$x <- paste(despesas.politicos.partidos[-1,]$x,despesas.politicos.partidos[-1,]$freq)
+
+despesas.total.parlamentar <- head(despesas.total.parlamentar[order(despesas.total.parlamentar$vlrLiquido, decreasing=TRUE), ], 10)
 
 despesas.media.partidos.anual <- data.frame(despesas.total.partidos$sgPartido, despesas.total.partidos$vlrLiquido/despesas.politicos.partidos[-1,]$freq)
 despesas.media.partidos.mensal <- data.frame(despesas.total.partidos$sgPartido, (despesas.total.partidos$vlrLiquido/despesas.politicos.partidos[-1,]$freq)/12)
@@ -84,6 +90,20 @@ add_trace(y = ~despesas.mes$nov, name = 'Nov') %>%
 add_trace(y = ~despesas.mes$dez, name = 'Dez') %>%
 add_trace(y = ~despesas.mes$jan, name = 'Jan') %>%
 layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title = ''),title = "Gastos de cada mês - Partidos - 2016~2017", barmode = 'group')
+
+#Plot Total Por Parlamentar(Nome)
+plot_ly(despesas.total.parlamentar,x="",y=~despesas.total.parlamentar$vlrLiquido[1],type = 'bar',name=despesas.total.parlamentar$txNomeParlamentar[1])  %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[2], name=despesas.total.parlamentar$txNomeParlamentar[2]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[3], name=despesas.total.parlamentar$txNomeParlamentar[3]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[4], name=despesas.total.parlamentar$txNomeParlamentar[4]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[5], name=despesas.total.parlamentar$txNomeParlamentar[5]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[6], name=despesas.total.parlamentar$txNomeParlamentar[6]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[7], name=despesas.total.parlamentar$txNomeParlamentar[7]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[8], name=despesas.total.parlamentar$txNomeParlamentar[8]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[9], name=despesas.total.parlamentar$txNomeParlamentar[9]) %>%
+add_trace(y=~despesas.total.parlamentar$vlrLiquido[10], name=despesas.total.parlamentar$txNomeParlamentar[10]) %>%
+layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title ="Parlamentares"),title = "TOP10 - Total de Gastos Anual - Por Parlamentar")
+
 
 #Plot Total Parlamentares
 plot_ly(despesas.politicos.partidos.pie, labels = ~x, values = ~freq, type = 'pie') %>%
