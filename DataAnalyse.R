@@ -2,11 +2,13 @@
 library(plyr)
 library(plotly)
 library(reshape2)
+library(readr)
+library(data.table)
 source("/home/guilherme/Documentos/GastosBrasil/lib.R")
 
 #load data csv
-despesas = read.csv("/home/guilherme/Documentos/GastosBrasil/Despesas.csv")
-partidos = read.csv("/home/guilherme/Documentos/GastosBrasil/Partidos.csv")
+despesas = fread("/home/guilherme/Documentos/GastosBrasil/Despesas.csv")
+partidos = fread("/home/guilherme/Documentos/GastosBrasil/Partidos.csv")
 
 #Analyse
 #Gasto de cada partido
@@ -104,7 +106,6 @@ add_trace(y=~despesas.total.parlamentar$vlrLiquido[9], name=despesas.total.parla
 add_trace(y=~despesas.total.parlamentar$vlrLiquido[10], name=despesas.total.parlamentar$txNomeParlamentar[10]) %>%
 layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title ="Parlamentares"),title = "TOP10 - Total de Gastos Anual - Por Parlamentar")
 
-
 #Plot Total Parlamentares
 plot_ly(despesas.politicos.partidos.pie, labels = ~x, values = ~freq, type = 'pie') %>%
 layout(title = 'Quantidade de Parlamentares - Partidos',
@@ -181,18 +182,10 @@ while(i < length(despesas.total.partidos$sgPartido)+1)
 }
 
 names(partidos.espc)[names(partidos.espc)=="V3"] <- "Espectro"
-
 partidos.espc.gastos <- aggregate(vlrLiquido ~ Espectro, partidos.espc, sum, na.rm=TRUE) 
+espc <- c("Centro", "Centro a Centro-direita", "Centro-direita", "Centro-direita e Direita", "Centro e Centro-esquerda", "Centro-esquerda", "Direita", "Esquerda a Centro-esquerda", "Esquerda a Extrema-esquerda")
+partidos.espc.gastos$Espectro = espc
 
-#Plot Gastos por Espectro
-plot_ly(partidos.espc.gastos,x="",y=~partidos.espc.gastos$vlrLiquido[1],type = 'bar',name="Centro")  %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[2], name ="Centro a Centro-direita ") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[3], name ="Centro-direita") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[4], name ="Centro-direita e Direita") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[5], name ="Centro e Centro-esquerda") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[6], name ="Centro-esquerda") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[7], name ="Direita") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[8], name ="Esquerda a Centro-esquerda") %>%
-add_trace(y=~partidos.espc.gastos$vlrLiquido[9], name ="Esquerda a Extrema-esquerda") %>%
+#Plot Gastos por Espectro 0
+plot_ly(partidos.espc.gastos,x="",y=~partidos.espc.gastos$vlrLiquido,type = 'bar' , color=partidos.espc.gastos$Espectro, colors = "Accent")  %>%
 layout(yaxis = list(title = 'Valor (R$)'), xaxis = list(title ="Espectros"),title = "Total de Gastos Anual - Espectros - Partidos")
-
